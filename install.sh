@@ -106,6 +106,7 @@ install_soga() {
     rm soga/ -rf
     wget https://github.com/themojie/havenode/releases/download/node/soga-linux-amd64.tar.gz
     tar zxvf soga-linux-${arch}.tar.gz
+    rm soga-linux-${arch}.tar.gz -rf
     mv soga /usr/local/
     cd /usr/local/soga/
     chmod +x soga
