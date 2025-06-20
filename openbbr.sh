@@ -8,9 +8,13 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-# 检查内核是否支持 BBR
-if ! grep -q 'bbr' /proc/sys/net/ipv4/tcp_available_congestion_control; then
-    echo "错误：当前内核不支持 BBR 拥塞控制算法"
+# 检查内核版本是否支持 BBR
+KERNEL_VERSION=$(uname -r)
+MIN_KERNEL="4.9"
+if [[ $(echo -e "$KERNEL_VERSION\n$MIN_KERNEL" | sort -V | head -n1) != "$MIN_KERNEL" ]]; then
+    echo "当前内核版本 ($KERNEL_VERSION) 支持 BBR，继续处理..."
+else
+    echo "错误：当前内核版本 ($KERNEL_VERSION) 低于 4.9，不支持 BBR"
     echo "建议升级内核到 4.9 或更高版本"
     exit 1
 fi
