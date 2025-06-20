@@ -8,14 +8,21 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-# 检查内核版本是否支持 BBR
-KERNEL_VERSION=$(uname -r)
+# 版本比较函数
+version_ge() {
+    [ "$(printf '%s\n' "$1" "$2" | sort -V | head -n1)" = "$2" ]
+}
+
+# 提取内核版本
+KERNEL_VERSION=$(uname -r | sed 's/[^0-9.].*//')
 MIN_KERNEL="4.9"
-if [[ $(echo -e "$KERNEL_VERSION\n$MIN_KERNEL" | sort -V | head -n1) != "$MIN_KERNEL" ]]; then
-    echo "当前内核版本 ($KERNEL_VERSION) 支持 BBR，继续处理..."
+
+# 检查内核版本
+if version_ge "$KERNEL_VERSION" "$MIN_KERNEL"; then
+    echo "内核版本 ($KERNEL_VERSION) 支持 BBR"
 else
-    echo "错误：当前内核版本 ($KERNEL_VERSION) 低于 4.9，不支持 BBR"
-    echo "建议升级内核到 4.9 或更高版本"
+    echo "错误：内核版本 ($KERNEL_VERSION) < 4.9，不支持 BBR"
+    echo "建议升级内核版本"
     exit 1
 fi
 
